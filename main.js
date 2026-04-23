@@ -320,7 +320,7 @@ function drawStamp() {
     const span = endDeg - startDeg;
     ctx.font = `900 ${fs}px "Onest", Georgia, sans-serif`;
     ctx.textAlign = 'center';
-    ctx.textBaseline = 'bottom';
+    ctx.textBaseline = 'top';
     ctx.fillStyle = makeGrad();
     chars.forEach((ch, i) => {
       const deg = startDeg + span * (i / Math.max(n - 1, 1));
@@ -329,7 +329,7 @@ function drawStamp() {
       const y = CY + r * Math.sin(rad);
       ctx.save();
       ctx.translate(x, y);
-      ctx.rotate(rad - Math.PI / 2);
+      ctx.rotate(rad + Math.PI / 2);
       ctx.fillText(ch, 0, 0);
       ctx.restore();
     });
@@ -402,16 +402,16 @@ function drawStamp() {
   ctx.fillStyle = makeGrad(CX - 123, CY - 62, CX + 123, CY + 62);
   ctx.fillText('GR', CX, CY + 12);
 
-  // Bottom arc text — widened to 170°, максимально крупно
-  arcText('СОЗДАНИЕ САЙТОВ И СТРАТЕГИЯ ПРОДАЖ', 222, 175, 5, 36);
+  // Top arc text — 170°, максимально крупно
+  arcText('СОЗДАНИЕ САЙТОВ И СТРАТЕГИЯ ПРОДАЖ', 222, 185, 355, 40);
 
-  // Stars at top
+  // Stars at bottom (text zone, below GR)
   ctx.font = '900 28px "Onest", Georgia, sans-serif';
   ctx.fillStyle = makeGrad();
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('✦', CX - 36, 112);
-  ctx.fillText('✦', CX + 36, 112);
+  ctx.fillText('✦', CX - 40, CY + 220);
+  ctx.fillText('✦', CX + 40, CY + 220);
 
   applyDistress(39);
 }
