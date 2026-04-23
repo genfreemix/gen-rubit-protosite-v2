@@ -298,3 +298,122 @@ leadForm?.addEventListener('submit', (event) => {
     formNote.textContent = 'Черновик письма сформирован. Если почтовый клиент не открылся, используйте адрес Kayur-Travel@mail.ru.';
   }
 });
+// ═══ STAMP CANVAS ═══════════════════════════════════════════════════════════
+function drawStamp() {
+  const cv = document.getElementById('stamp-cv');
+  if (!cv) return;
+  const ctx = cv.getContext('2d');
+  const W = 700, H = 700, CX = 350, CY = 350;
+
+  function makeGrad(x1 = 0, y1 = 0, x2 = W, y2 = H) {
+    const g = ctx.createLinearGradient(x1, y1, x2, y2);
+    g.addColorStop(0,    '#4B5FFA');
+    g.addColorStop(0.32, '#8B3FD9');
+    g.addColorStop(0.66, '#E8364A');
+    g.addColorStop(1,    '#F97316');
+    return g;
+  }
+
+  function arcText(text, r, startDeg, endDeg, fs) {
+    const chars = [...text];
+    const n = chars.length;
+    const span = endDeg - startDeg;
+    ctx.font = `900 ${fs}px "Onest", Georgia, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.fillStyle = makeGrad();
+    chars.forEach((ch, i) => {
+      const deg = startDeg + span * (i / Math.max(n - 1, 1));
+      const rad = deg * Math.PI / 180;
+      const x = CX + r * Math.cos(rad);
+      const y = CY + r * Math.sin(rad);
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(rad - Math.PI / 2);
+      ctx.fillText(ch, 0, 0);
+      ctx.restore();
+    });
+  }
+
+  function applyDistress(amount) {
+    if (amount <= 0) return;
+    let s = 42;
+    function rng() { s ^= s << 13; s ^= s >> 17; s ^= s << 5; return (s >>> 0) / 4294967296; }
+    const count = Math.floor(amount * 120);
+    for (let i = 0; i < count; i++) {
+      const angle = rng() * Math.PI * 2;
+      const dist  = rng() * 310;
+      const x = CX + Math.cos(angle) * dist;
+      const y = CY + Math.sin(angle) * dist;
+      const rr = 1 + rng() * (amount / 20);
+      const a  = 0.4 + rng() * 0.6;
+      ctx.beginPath();
+      ctx.arc(x, y, rr, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${a})`;
+      ctx.fill();
+    }
+    const edgeCount = Math.floor(amount * 30);
+    for (let i = 0; i < edgeCount; i++) {
+      const ringR = [16, 275, 250, 168, 148][Math.floor(rng() * 5)] || 275;
+      const a0   = rng() * Math.PI * 2;
+      const sp   = 0.02 + rng() * 0.08;
+      ctx.beginPath();
+      ctx.arc(CX, CY, ringR + (rng() - 0.5) * 4, a0, a0 + sp);
+      ctx.strokeStyle = `rgba(255,255,255,${0.5 + rng() * 0.5})`;
+      ctx.lineWidth = 2 + rng() * 4;
+      ctx.stroke();
+    }
+  }
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Outer thick ring
+  ctx.beginPath();
+  ctx.arc(CX, CY, 308, 0, Math.PI * 2);
+  ctx.strokeStyle = makeGrad();
+  ctx.lineWidth = 36;
+  ctx.stroke();
+
+  // Separator ring
+  ctx.beginPath();
+  ctx.arc(CX, CY, 275, 0, Math.PI * 2);
+  ctx.strokeStyle = makeGrad();
+  ctx.lineWidth = 4;
+  ctx.stroke();
+
+  // Inner circle
+  ctx.beginPath();
+  ctx.arc(CX, CY, 170, 0, Math.PI * 2);
+  ctx.strokeStyle = makeGrad();
+  ctx.lineWidth = 19;
+  ctx.stroke();
+
+  // Thin inner ring
+  ctx.beginPath();
+  ctx.arc(CX, CY, 148, 0, Math.PI * 2);
+  ctx.strokeStyle = makeGrad();
+  ctx.lineWidth = 3;
+  ctx.stroke();
+
+  // GR monogram
+  ctx.font = '900 123px "Onest", Georgia, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = makeGrad(CX - 123, CY - 62, CX + 123, CY + 62);
+  ctx.fillText('GR', CX, CY + 12);
+
+  // Bottom arc text — widened to 170°, максимально крупно
+  arcText('СОЗДАНИЕ САЙТОВ И СТРАТЕГИЯ ПРОДАЖ', 222, 175, 5, 36);
+
+  // Stars at top
+  ctx.font = '900 28px "Onest", Georgia, sans-serif';
+  ctx.fillStyle = makeGrad();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('✦', CX - 36, 112);
+  ctx.fillText('✦', CX + 36, 112);
+
+  applyDistress(39);
+}
+
+document.fonts.ready.then(drawStamp);
