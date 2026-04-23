@@ -157,6 +157,92 @@ const revealObserver = new IntersectionObserver(
 
 revealElements.forEach((element) => revealObserver.observe(element));
 
+// ═══ MONEY EXPLOSION ═════════════════════════════════════════
+const BILLS = [
+  { type: 'bill', symbol: '$', bg: '#2d7a3a', text: '#a8f0b0' },
+  { type: 'bill', symbol: '$', bg: '#1e5c2b', text: '#c5f5cc' },
+  { type: 'bill', symbol: '€', bg: '#3a3fb5', text: '#b0b8ff' },
+  { type: 'bill', symbol: '€', bg: '#5c2d8a', text: '#e0b8ff' },
+  { type: 'bill', symbol: '$', bg: '#3a7a2d', text: '#b8f0a8' },
+  { type: 'bill', symbol: '€', bg: '#2d3ab5', text: '#a8b8ff' },
+  { type: 'coin', symbol: '●', bg: 'radial-gradient(circle at 35% 35%, #ffe066, #f5a800, #b87a00)', text: '#fff8dc' },
+  { type: 'coin', symbol: '●', bg: 'radial-gradient(circle at 35% 35%, #ffd700, #e8960a, #a06000)', text: '#fff3b0' },
+  { type: 'coin', symbol: '●', bg: 'radial-gradient(circle at 35% 35%, #ffec80, #f0b000, #c07800)', text: '#fffacd' },
+];
+
+function spawnMoney(e) {
+  const rect = e.currentTarget.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  const count = 14;
+
+  for (let i = 0; i < count; i++) {
+    const bill = BILLS[Math.floor(Math.random() * BILLS.length)];
+    const el = document.createElement('div');
+    el.className = bill.type === 'coin' ? 'money-coin' : 'money-bill';
+    if (bill.type === 'bill') el.textContent = bill.symbol;
+
+    const angle = (i / count) * 360 + Math.random() * 26 - 13;
+    const dist = 160 + Math.random() * 200;
+    const dx = Math.cos((angle * Math.PI) / 180) * dist;
+    const dy = Math.sin((angle * Math.PI) / 180) * dist - 60;
+    const rot = Math.random() * 600 - 300;
+    const duration = 1600 + Math.random() * 600;
+
+    el.style.cssText = `
+      left:${cx}px;
+      top:${cy}px;
+      background:${bill.bg};
+      color:${bill.text};
+      --dx:${dx}px;
+      --dy:${dy}px;
+      --rot:${rot}deg;
+      --dur:${duration}ms;
+      animation-delay:${i * 22}ms;
+    `;
+
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), duration + i * 22 + 100);
+  }
+
+  // ── Одна особая купюра — летит долго и блуждает ──────────────
+  const special = document.createElement('div');
+  special.className = 'money-bill money-bill--special';
+  special.textContent = Math.random() > 0.5 ? '$' : '€';
+  const wx1 = (Math.random() - 0.5) * 320;
+  const wy1 = -160 - Math.random() * 120;
+  const wx2 = (Math.random() - 0.5) * 440;
+  const wy2 = -60 + Math.random() * 220;
+  const wx3 = (Math.random() - 0.5) * 260;
+  const wy3 = 80 + Math.random() * 160;
+  special.style.cssText = `
+    left:${cx}px; top:${cy}px;
+    background:#1e5c2b; color:#c5f5cc;
+    --wx1:${wx1}px; --wy1:${wy1}px;
+    --wx2:${wx2}px; --wy2:${wy2}px;
+    --wx3:${wx3}px; --wy3:${wy3}px;
+    --wr1:${Math.random()*300 - 150}deg;
+    --wr2:${Math.random()*600 - 300}deg;
+    --wr3:${Math.random()*900 - 450}deg;
+  `;
+  document.body.appendChild(special);
+  setTimeout(() => special.remove(), 5600);
+}
+
+document.querySelectorAll('.button.primary').forEach((btn) => {
+  btn.addEventListener('click', spawnMoney);
+});
+
+// ═══ PRICING ACCORDION ═══════════════════════════════════════
+document.querySelectorAll('.pricing-card-top').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const card = btn.closest('.pricing-card');
+    const isOpen = card.classList.contains('is-open');
+    document.querySelectorAll('.pricing-card').forEach((c) => c.classList.remove('is-open'));
+    if (!isOpen) card.classList.add('is-open');
+  });
+});
+
 const leadForm = document.querySelector('#lead-form');
 const formNote = document.querySelector('#form-note');
 const interestField = document.querySelector('select[name="interest"]');
