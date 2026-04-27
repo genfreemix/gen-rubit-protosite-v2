@@ -405,8 +405,8 @@ function drawStamp() {
   ctx.fillStyle = makeGrad(CX - 123, CY - 62, CX + 123, CY + 62);
   ctx.fillText('GR', CX, CY + 12);
 
-  // Top arc text — 210°, максимально крупно
-  arcText('СОЗДАНИЕ САЙТОВ И СТРАТЕГИЯ ПРОДАЖ', 228, 165, 375, 50);
+  // Top arc text — 180°, строго в полосе между кольцами
+  arcText('СОЗДАНИЕ САЙТОВ И СТРАТЕГИЯ ПРОДАЖ', 255, 180, 360, 48);
 
   // Stars at bottom (text zone, below GR)
   ctx.font = '900 28px "Onest", Georgia, sans-serif';
