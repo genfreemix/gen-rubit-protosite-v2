@@ -315,7 +315,7 @@ function drawStamp() {
   }
 
   function arcText(text, r, centerDeg, fs, options = {}) {
-    const { invert = false, letterSpacing = 4, maxSpanDeg = 178 } = options;
+    const { invert = false, letterSpacing = 4, maxSpanDeg = 178, glitch = 0 } = options;
     const chars = [...text];
     ctx.font = `900 ${fs}px "Onest", Georgia, sans-serif`;
     ctx.textAlign = 'center';
@@ -340,6 +340,15 @@ function drawStamp() {
       ctx.lineWidth = 3.2;
       ctx.lineJoin = 'round';
       ctx.strokeText(ch, 0, 0);
+      if (glitch > 0 && ch !== ' ') {
+        const shift = (((i * 37) % 7) - 3) * glitch * 0.34;
+        ctx.globalAlpha = 0.5;
+        ctx.fillStyle = '#12D8FF';
+        ctx.fillText(ch, shift - glitch, -glitch * 0.42);
+        ctx.fillStyle = '#FF2E88';
+        ctx.fillText(ch, shift + glitch, glitch * 0.38);
+        ctx.globalAlpha = 1;
+      }
       ctx.fillStyle = makeGrad();
       ctx.fillText(ch, 0, 0);
       ctx.restore();
@@ -417,8 +426,8 @@ function drawStamp() {
   ctx.fillText('GR', CX, CY + 12);
 
   // Top and bottom arc text, spaced by measured glyph width for readability.
-  arcText('СОЗДАНИЕ САЙТОВ', 255, 270, 56, { letterSpacing: 5, maxSpanDeg: 156 });
-  arcText('И СТРАТЕГИЯ ПРОДАЖ', 255, 90, 48, { invert: true, letterSpacing: 4, maxSpanDeg: 168 });
+  arcText('СОЗДАНИЕ САЙТОВ', 235, 270, 56, { letterSpacing: 5, maxSpanDeg: 156, glitch: 1.8 });
+  arcText('И СТРАТЕГИЯ ПРОДАЖ', 235, 90, 48, { invert: true, letterSpacing: 4, maxSpanDeg: 168, glitch: 1.6 });
 
   // Side separators
   ctx.font = '900 28px "Onest", Georgia, sans-serif';
