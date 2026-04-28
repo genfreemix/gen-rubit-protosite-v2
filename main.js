@@ -314,27 +314,36 @@ function drawStamp() {
     return g;
   }
 
-  function arcText(text, r, startDeg, endDeg, fs) {
+  function arcText(text, r, centerDeg, fs, options = {}) {
+    const { invert = false, letterSpacing = 4, maxSpanDeg = 178 } = options;
     const chars = [...text];
-    const n = chars.length;
-    const span = endDeg - startDeg;
     ctx.font = `900 ${fs}px "Onest", Georgia, sans-serif`;
     ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
+    ctx.textBaseline = 'middle';
+
+    const widths = chars.map((ch) => Math.max(ctx.measureText(ch).width, fs * 0.22));
+    const textLength = widths.reduce((sum, width) => sum + width, 0) + letterSpacing * Math.max(chars.length - 1, 0);
+    const span = Math.min(maxSpanDeg * Math.PI / 180, textLength / r);
+    const center = centerDeg * Math.PI / 180;
+    let angle = center + (invert ? span / 2 : -span / 2);
+
     chars.forEach((ch, i) => {
-      const deg = startDeg + span * (i / Math.max(n - 1, 1));
-      const rad = deg * Math.PI / 180;
+      const step = (widths[i] + letterSpacing) / r;
+      angle += (invert ? -1 : 1) * step / 2;
+      const rad = angle;
       const x = CX + r * Math.cos(rad);
       const y = CY + r * Math.sin(rad);
       ctx.save();
       ctx.translate(x, y);
-      ctx.rotate(rad + Math.PI / 2);
+      ctx.rotate(rad + (invert ? -Math.PI / 2 : Math.PI / 2));
+      ctx.strokeStyle = 'rgba(255,255,255,0.62)';
+      ctx.lineWidth = 3.2;
+      ctx.lineJoin = 'round';
+      ctx.strokeText(ch, 0, 0);
       ctx.fillStyle = makeGrad();
       ctx.fillText(ch, 0, 0);
-      ctx.strokeStyle = makeGrad();
-      ctx.lineWidth = 1.5;
-      ctx.strokeText(ch, 0, 0);
       ctx.restore();
+      angle += (invert ? -1 : 1) * step / 2;
     });
   }
 
@@ -398,6 +407,8 @@ function drawStamp() {
   ctx.lineWidth = 3;
   ctx.stroke();
 
+  applyDistress(30);
+
   // GR monogram
   ctx.font = '900 123px "Onest", Georgia, sans-serif';
   ctx.textAlign = 'center';
@@ -405,18 +416,17 @@ function drawStamp() {
   ctx.fillStyle = makeGrad(CX - 123, CY - 62, CX + 123, CY + 62);
   ctx.fillText('GR', CX, CY + 12);
 
-  // Top arc text — 180°, строго в полосе между кольцами
-  arcText('СОЗДАНИЕ САЙТОВ И СТРАТЕГИЯ ПРОДАЖ', 255, 180, 360, 48);
+  // Top and bottom arc text, spaced by measured glyph width for readability.
+  arcText('СОЗДАНИЕ САЙТОВ', 255, 270, 56, { letterSpacing: 5, maxSpanDeg: 156 });
+  arcText('И СТРАТЕГИЯ ПРОДАЖ', 255, 90, 48, { invert: true, letterSpacing: 4, maxSpanDeg: 168 });
 
-  // Stars at bottom (text zone, below GR)
+  // Side separators
   ctx.font = '900 28px "Onest", Georgia, sans-serif';
   ctx.fillStyle = makeGrad();
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('✦', CX - 40, CY + 220);
-  ctx.fillText('✦', CX + 40, CY + 220);
-
-  applyDistress(39);
+  ctx.fillText('✦', CX - 222, CY);
+  ctx.fillText('✦', CX + 222, CY);
 }
 
 document.fonts.ready.then(drawStamp);
