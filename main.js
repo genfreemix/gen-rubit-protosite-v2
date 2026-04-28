@@ -315,7 +315,7 @@ function drawStamp() {
   }
 
   function arcText(text, r, centerDeg, fs, options = {}) {
-    const { invert = false, letterSpacing = 4, maxSpanDeg = 178, glitch = 0 } = options;
+    const { invert = false, letterSpacing = 4, maxSpanDeg = 178, glitch = 0, color = '#312E81' } = options;
     const chars = [...text];
     ctx.font = `900 ${fs}px "Onest", Georgia, sans-serif`;
     ctx.textAlign = 'center';
@@ -336,20 +336,23 @@ function drawStamp() {
       ctx.save();
       ctx.translate(x, y);
       ctx.rotate(rad + (invert ? -Math.PI / 2 : Math.PI / 2));
-      ctx.strokeStyle = 'rgba(255,255,255,0.62)';
-      ctx.lineWidth = 3.2;
+      ctx.shadowColor = 'rgba(255,255,255,0.42)';
+      ctx.shadowBlur = 2;
+      ctx.strokeStyle = 'rgba(255,255,255,0.72)';
+      ctx.lineWidth = 2.6;
       ctx.lineJoin = 'round';
       ctx.strokeText(ch, 0, 0);
+      ctx.shadowBlur = 0;
       if (glitch > 0 && ch !== ' ') {
-        const shift = (((i * 37) % 7) - 3) * glitch * 0.34;
-        ctx.globalAlpha = 0.5;
-        ctx.fillStyle = '#12D8FF';
-        ctx.fillText(ch, shift - glitch, -glitch * 0.42);
-        ctx.fillStyle = '#FF2E88';
-        ctx.fillText(ch, shift + glitch, glitch * 0.38);
+        const shift = (((i * 37) % 7) - 3) * glitch * 0.18;
+        ctx.globalAlpha = 0.28;
+        ctx.fillStyle = '#0EA5E9';
+        ctx.fillText(ch, shift - glitch, -glitch * 0.25);
+        ctx.fillStyle = '#F43F5E';
+        ctx.fillText(ch, shift + glitch, glitch * 0.25);
         ctx.globalAlpha = 1;
       }
-      ctx.fillStyle = makeGrad();
+      ctx.fillStyle = color;
       ctx.fillText(ch, 0, 0);
       ctx.restore();
       angle += (invert ? -1 : 1) * step / 2;
@@ -425,9 +428,8 @@ function drawStamp() {
   ctx.fillStyle = makeGrad(CX - 123, CY - 62, CX + 123, CY + 62);
   ctx.fillText('GR', CX, CY + 12);
 
-  // Top and bottom arc text, spaced by measured glyph width for readability.
-  arcText('СОЗДАНИЕ САЙТОВ', 235, 270, 56, { letterSpacing: 5, maxSpanDeg: 156, glitch: 1.8 });
-  arcText('И СТРАТЕГИЯ ПРОДАЖ', 235, 90, 48, { invert: true, letterSpacing: 4, maxSpanDeg: 168, glitch: 1.6 });
+  // Arc text, spaced by measured glyph width for readability.
+  arcText('СОЗДАНИЕ САЙТОВ • СТРАТЕГИЯ ПРОДАЖ', 235, 270, 40, { letterSpacing: 2.8, maxSpanDeg: 218, glitch: 1.2 });
 
   // Side separators
   ctx.font = '900 28px "Onest", Georgia, sans-serif';
